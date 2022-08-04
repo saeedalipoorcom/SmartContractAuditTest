@@ -12,6 +12,7 @@ describe('Lock', function () {
   let addr1;
   let addr2;
   let addr3;
+  let addr4;
 
   let TX;
   let answer;
@@ -19,7 +20,8 @@ describe('Lock', function () {
   let RLCContract;
 
   beforeEach(async () => {
-    [deployer, addr1, addr2, addr3] = await ethers.getSigners();
+    [deployer, addr1, addr2, addr3, addr4] =
+      await ethers.getSigners();
 
     const RLC = await ethers.getContractFactory('RLC');
     RLCContract = await RLC.deploy();
@@ -148,6 +150,23 @@ describe('Lock', function () {
         )
       ).to.be.revertedWith(
         'there is not enough allowance for transfer token'
+      );
+
+      // address 3 can't use transfer from to transfer money from deployer to address2
+
+      await expect(
+        RLCContract.connect(addr4).transferFrom(
+          deployer.address,
+          addr4.address,
+          ethers.utils.parseEther('100')
+        )
+      ).to.be.revertedWith(
+        'there is not enough allowance for transfer token'
+      );
+
+      // now check balance of addr4 ! to 0 .
+      expect(await RLCContract.balanceOf(addr4.address)).to.equal(
+        ethers.utils.parseEther('0')
       );
     });
   });
