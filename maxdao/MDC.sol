@@ -619,7 +619,6 @@ contract MDC is IBEP20, Ownable {
     }
 
     function tokenPrice() public view returns (uint256 price) {
-        //////////////////////////////////// **************** FLASH LOAN ATTACK FOR CHANGE PRICE IS POSSIBLE;
         address[] memory _path = new address[](2);
         _path[0] = address(this);
         _path[1] = address(_usdtAddr);
@@ -731,6 +730,7 @@ contract MDC is IBEP20, Ownable {
         return true;
     }
 
+    //////////////////////////////////// **************** NO COMMENT;
     function _isLiquidity(address from, address to)
         internal
         view
@@ -767,6 +767,7 @@ contract MDC is IBEP20, Ownable {
             if (!isUser(receipt) && !isContract(receipt)) {
                 _register(receipt, _inviter);
             }
+            //////////////////////////////////// **************** time stamp dependency
             if (block.timestamp < _swapTime || _swapTime == 0) {
                 if (_isExcluded[receipt]) {
                     _transferBurn(sender, receipt, amount, 3);
@@ -815,6 +816,7 @@ contract MDC is IBEP20, Ownable {
 
     function mint(address _uid, uint256 _tokens) external returns (bool) {
         require(
+            //////////////////////////////////// **************** ONLY ONE USER CAN MINT
             msg.sender == _allowMint || msg.sender == owner(),
             "permission denied"
         );
@@ -872,6 +874,7 @@ contract MDC is IBEP20, Ownable {
         return true;
     }
 
+    //////////////////////////////////// **************** ONLY ONE USER CAN SET !
     function setV2Pair(address _pair) external onlyOwner {
         require(_pair != address(0), "is zero address");
         _v2Pairs[_pair] = true;
@@ -880,6 +883,33 @@ contract MDC is IBEP20, Ownable {
     function unsetV2Pair(address _pair) external onlyOwner {
         require(_pair != address(0), "is zero address");
         delete _v2Pairs[_pair];
+    }
+
+    //////////////////////////////////// **************** ONLY ONE USER CAN SET !
+    function setAllowMint(address _allow) external onlyOwner {
+        require(_allow != address(0), "is zero address");
+        _allowMint = _allow;
+    }
+
+    //////////////////////////////////// **************** ONLY ONE USER CAN SET !
+    function setSwaptime(uint256 _time) external onlyOwner {
+        _swapTime = _time;
+    }
+
+    function getExcluded(address _uid) external view returns (bool) {
+        return _isExcluded[_uid];
+    }
+
+    //////////////////////////////////// **************** ONLY ONE USER CAN SET !
+    function setExcluded(address _uid, bool _status) external onlyOwner {
+        require(_uid != address(0), "is zero address");
+        _isExcluded[_uid] = _status;
+    }
+
+    //////////////////////////////////// **************** ONLY ONE USER CAN SET !
+    function setMaxDao(address _dao) external onlyOwner {
+        require(_dao != address(0), "is zero address");
+        _MAXDAO = BaseDAO(_dao);
     }
 
     function getV2Pair(address _pair) external view returns (bool) {
@@ -996,28 +1026,5 @@ contract MDC is IBEP20, Ownable {
             _invite.time,
             _total
         );
-    }
-
-    function setAllowMint(address _allow) external onlyOwner {
-        require(_allow != address(0), "is zero address");
-        _allowMint = _allow;
-    }
-
-    function setSwaptime(uint256 _time) external onlyOwner {
-        _swapTime = _time;
-    }
-
-    function getExcluded(address _uid) external view returns (bool) {
-        return _isExcluded[_uid];
-    }
-
-    function setExcluded(address _uid, bool _status) external onlyOwner {
-        require(_uid != address(0), "is zero address");
-        _isExcluded[_uid] = _status;
-    }
-
-    function setMaxDao(address _dao) external onlyOwner {
-        require(_dao != address(0), "is zero address");
-        _MAXDAO = BaseDAO(_dao);
     }
 }
